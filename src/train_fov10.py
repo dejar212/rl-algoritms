@@ -28,18 +28,41 @@ def main():
     
     print(f"Initializing PPO (FOV={fov}, Soft Rewards)...")
     
-    model = PPO(
-        "CnnPolicy", 
-        env, 
-        policy_kwargs=policy_kwargs,
-        verbose=1,
-        learning_rate=3e-4,
-        n_steps=2048,
-        batch_size=64,
-        gamma=0.99,
-        gae_lambda=0.95,
-        tensorboard_log="./logs/fov10/",
-    )
+    # Check for existing checkpoints to resume
+    checkpoint_dir = './models_fov10/'
+    latest_checkpoint = None
+    if os.path.exists(checkpoint_dir):
+        files = [f for f in os.listdir(checkpoint_dir) if f.endswith('.zip')]
+        if files:
+            # Sort by step count (assuming format ppo_fov10_X_steps.zip)
+            try:
+                files.sort(key=lambda x: int(x.split('_')[2]))
+                latest_checkpoint = os.path.join(checkpoint_dir, files[-1])
+            except:
+                pass # Fallback to new model if naming is unexpected
+
+    if latest_checkpoint:
+        print(f"Resuming training from checkpoint: {latest_checkpoint}")
+        model = PPO.load(latest_checkpoint, env=env)
+        # Update tensorboard log to continue where left off (optional, usually handled by SB3 if same log dir)
+        # Reset tensorboard logging is tricky with load, but we can pass tensorboard_log again if needed.
+        # model.set_logger(...) might be needed but let's keep it simple.
+        # Ensure we have the right tensorboard log path
+        model.tensorboard_log = "./logs/fov10/"
+    else:
+        print("No checkpoint found. Starting fresh.")
+        model = PPO(
+            "CnnPolicy", 
+            env, 
+            policy_kwargs=policy_kwargs,
+            verbose=1,
+            learning_rate=3e-4,
+            n_steps=2048,
+            batch_size=64,
+            gamma=0.99,
+            gae_lambda=0.95,
+            tensorboard_log="./logs/fov10/",
+        )
     
     # Callbacks
     checkpoint_callback = CheckpointCallback(
@@ -58,4 +81,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
 
