@@ -27,9 +27,13 @@ def main():
     )
     
     print(f"Initializing PPO (FOV={fov}, Soft Rewards)...")
+    print(f"Current working directory: {os.getcwd()}")
     
     # Check for existing checkpoints to resume
     checkpoint_dir = './models_fov10/'
+    if not os.path.exists(checkpoint_dir):
+        os.makedirs(checkpoint_dir)
+        
     latest_checkpoint = None
     if os.path.exists(checkpoint_dir):
         files = [f for f in os.listdir(checkpoint_dir) if f.endswith('.zip')]
@@ -66,7 +70,7 @@ def main():
     
     # Callbacks
     checkpoint_callback = CheckpointCallback(
-        save_freq=50000,
+        save_freq=10000,
         save_path='./models_fov10/',
         name_prefix='ppo_fov10'
     )
