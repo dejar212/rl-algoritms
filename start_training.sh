@@ -14,6 +14,7 @@ cd "$PROJECT_DIR" || { echo "Directory $PROJECT_DIR not found"; exit 1; }
 
 # Setup Environment
 export PYTHONPATH="$PROJECT_DIR/src"
+export SDL_VIDEODRIVER=dummy
 
 echo "=== Starting Training ==="
 echo "Working Dir: $(pwd)"
