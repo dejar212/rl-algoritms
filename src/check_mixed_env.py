@@ -18,3 +18,5 @@ assert obs['vector'].shape == (10,), f"Wrong vector shape: {obs['vector'].shape}
 print("Check Passed!")
 env.close()
 
+
+
